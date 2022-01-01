@@ -1,3 +1,4 @@
+import functools
 import json
 import warnings
 
@@ -18,9 +19,13 @@ class Graph(networkx.Graph):
     to save and load graphs as JSON files.
 
     """
-
     def __repr__(self):
         return "<Graph [{} nodes, {} edges]>".format(len(self.nodes), len(self.edges))
+
+    @classmethod
+    def from_networkx(cls, graph: networkx.Graph):
+        g = cls(graph)
+        return g
 
     @classmethod
     def from_json(cls, json_file):
@@ -31,7 +36,7 @@ class Graph(networkx.Graph):
         with open(json_file) as f:
             data = json.load(f)
         g = json_graph.adjacency_graph(data)
-        graph = cls(g)
+        graph = cls.from_networkx(g)
         graph.issue_warnings()
         return graph
 
@@ -225,6 +230,10 @@ class Graph(networkx.Graph):
         }
 
         networkx.set_node_attributes(self, node_attributes)
+
+    @functools.cached_property
+    def nodes(self):
+        return super().nodes
 
     @property
     def islands(self):
