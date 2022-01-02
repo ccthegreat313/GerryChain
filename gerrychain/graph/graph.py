@@ -239,6 +239,10 @@ class Graph(networkx.Graph):
     def nodes(self):
         return super().nodes
 
+    @functools.cached_property
+    def edges(self):
+        return super().edges
+
     @property
     def islands(self):
         """The set of degree-0 nodes."""
