@@ -191,6 +191,8 @@ class Graph(networkx.Graph):
         else:
             self.data = df[columns]
 
+        del self.nodes
+
     def join(self, dataframe, columns=None, left_index=None, right_index=None):
         """Add data from a dataframe to the graph, matching nodes to rows when
         the node's `left_index` attribute equals the row's `right_index` value.
@@ -230,6 +232,8 @@ class Graph(networkx.Graph):
         }
 
         networkx.set_node_attributes(self, node_attributes)
+
+        del self.nodes
 
     @functools.cache
     def cached_neighbors(self, n):
@@ -281,6 +285,8 @@ def add_boundary_perimeters(graph, geometries):
             )
             boundary_perimeter = total_perimeter - shared_perimeter
             graph.nodes[node]["boundary_perim"] = boundary_perimeter
+
+    del graph.nodes
 
 
 def check_dataframe(df):
