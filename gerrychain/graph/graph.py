@@ -231,6 +231,10 @@ class Graph(networkx.Graph):
 
         networkx.set_node_attributes(self, node_attributes)
 
+    @functools.cache
+    def cached_neighbors(self, n):
+        return list(super().neighbors(n))
+
     @functools.cached_property
     def nodes(self):
         return super().nodes

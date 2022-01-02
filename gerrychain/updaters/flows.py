@@ -8,7 +8,7 @@ def neighbor_flips(partition):
     return {
         tuple(sorted((node, neighbor)))
         for node in partition.flips
-        for neighbor in partition.graph.neighbors(node)
+        for neighbor in partition.graph.cached_neighbors(node)
     }
 
 
