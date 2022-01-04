@@ -5,6 +5,7 @@ import pytest
 
 from gerrychain import MarkovChain
 from gerrychain.constraints import contiguous, within_percent_of_ideal_population
+from gerrychain.graph import Graph
 from gerrychain.partition import Partition
 from gerrychain.proposals import recom
 from gerrychain.tree import (
@@ -22,7 +23,7 @@ from gerrychain.updaters import Tally, cut_edges
 def graph_with_pop(three_by_three_grid):
     for node in three_by_three_grid:
         three_by_three_grid.nodes[node]["pop"] = 1
-    return three_by_three_grid
+    return Graph.from_networkx(three_by_three_grid)
 
 
 @pytest.fixture
@@ -41,7 +42,7 @@ def twelve_by_twelve_with_pop():
     grid = networkx.relabel_nodes(xy_grid, nodes)
     for node in grid:
         grid.nodes[node]["pop"] = 1
-    return grid
+    return Graph.from_networkx(grid)
 
 
 def test_bipartition_tree_returns_a_subset_of_nodes(graph_with_pop):

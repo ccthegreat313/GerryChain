@@ -1,3 +1,4 @@
+import collections
 import functools
 import json
 import warnings
@@ -242,6 +243,16 @@ class Graph(networkx.Graph):
     @functools.cached_property
     def nodes(self):
         return super().nodes
+
+    @functools.cached_property
+    def cached_node_data_lookup(self):
+        cached_node_fields = collections.defaultdict()
+        for node in self.nodes:
+            cached_node_fields[node] = collections.defaultdict()
+            for field in self.nodes[node].keys():
+                cached_node_fields[node][field] = self.nodes[node][field]
+
+        return cached_node_fields
 
     @functools.cached_property
     def edges(self):
