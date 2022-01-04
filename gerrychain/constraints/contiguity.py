@@ -90,7 +90,7 @@ def single_flip_contiguous(partition):
 
         old_neighbors = [
             node
-            for node in graph.cached_neighbors(changed_node)
+            for node in graph.neighbors(changed_node)
             if assignment[node] == old_assignment
         ]
 

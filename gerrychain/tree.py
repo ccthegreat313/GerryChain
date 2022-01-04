@@ -15,7 +15,7 @@ def successors(h, root):
 
 def random_spanning_tree(graph):
     """ Builds a spanning tree chosen by Kruskal's method using random weights.
-        :param graph: Networkx Graph
+        :param graph: FrozenGraph
 
         Important Note:
         The key is specifically labelled "random_weight" instead of the previously
@@ -46,7 +46,7 @@ def uniform_spanning_tree(graph, choice=random.choice):
     for node in graph.nodes:
         u = node
         while u not in tree_nodes:
-            next_node[u] = choice(graph.cached_neighbors(u))
+            next_node[u] = choice(graph.neighbors(u))
             u = next_node[u]
 
         u = node

@@ -1,10 +1,12 @@
 import collections
 import functools
 import json
+from typing import Any
 import warnings
 
 import geopandas as gp
 import networkx
+from networkx.classes.function import frozen
 from networkx.readwrite import json_graph
 from shapely.ops import unary_union
 from shapely.prepared import prep
@@ -171,6 +173,14 @@ class Graph(networkx.Graph):
         graph.add_data(df, columns=cols_to_add)
         return graph
 
+    def lookup(self, node, field):
+        """
+        Lookup a node/field attribute.
+        :param node: Node to look up.
+        :param field: Field to look up.
+        """
+        return self.nodes[node][field]
+
     def add_data(self, df, columns=None):
         """Add columns of a DataFrame to a graph as node attributes using
         by matching the DataFrame's index to node ids.
@@ -191,8 +201,6 @@ class Graph(networkx.Graph):
             self.data[columns] = df[columns]
         else:
             self.data = df[columns]
-
-        del self.nodes
 
     def join(self, dataframe, columns=None, left_index=None, right_index=None):
         """Add data from a dataframe to the graph, matching nodes to rows when
@@ -234,30 +242,6 @@ class Graph(networkx.Graph):
 
         networkx.set_node_attributes(self, node_attributes)
 
-        del self.nodes
-
-    @functools.cache
-    def cached_neighbors(self, n):
-        return list(super().neighbors(n))
-
-    @functools.cached_property
-    def nodes(self):
-        return super().nodes
-
-    @functools.cached_property
-    def cached_node_data_lookup(self):
-        cached_node_fields = collections.defaultdict()
-        for node in self.nodes:
-            cached_node_fields[node] = collections.defaultdict()
-            for field in self.nodes[node].keys():
-                cached_node_fields[node][field] = self.nodes[node][field]
-
-        return cached_node_fields
-
-    @functools.cached_property
-    def edges(self):
-        return super().edges
-
     @property
     def islands(self):
         """The set of degree-0 nodes."""
@@ -297,7 +281,6 @@ def add_boundary_perimeters(graph, geometries):
             boundary_perimeter = total_perimeter - shared_perimeter
             graph.nodes[node]["boundary_perim"] = boundary_perimeter
 
-    del graph.nodes
 
 
 def check_dataframe(df):
@@ -344,3 +327,62 @@ def convert_geometries_to_geojson(data):
                 # This is what :func:`geopandas.GeoSeries.to_json` uses under
                 # the hood.
                 node[key] = node[key].__geo_interface__
+
+class FrozenGraph:
+    """ Represents an immutable graph to be partitioned. It is based off :class:`Graph`.
+
+    This speeds up chain runs and prevents having to deal with cache invalidation issues.
+    This class behaves slightly differently than :class:`Graph` or :class:`networkx.Graph`.
+    """
+    __slots__ = [
+        "graph"
+    ]
+
+    def __init__(self, graph: Graph):
+        self.graph = networkx.classes.function.freeze(graph)
+        self.graph.join = frozen
+        self.graph.add_data = frozen
+        self.graph.add_data = frozen
+
+    @functools.cache
+    def __len__(self):
+        return len(self.graph)
+
+    @functools.cache
+    def __getattribute__(self, __name: str) -> Any:
+        try:
+            return object.__getattribute__(self, __name)
+        except AttributeError:
+            return object.__getattribute__(self.graph, __name)
+
+    def __iter__(self):
+        yield from self.node_indicies
+
+    # @classmethod
+    # def ensure_node_labels_integer(cls, graph):
+    #     g = cls(networkx.relabel.convert_node_labels_to_integers(graph))
+    #     return g
+
+    @functools.cache
+    def neighbors(self, n):
+        return tuple(self.graph.neighbors(n))
+
+    @functools.cached_property
+    def node_indicies(self):
+        return tuple(self.graph.nodes)
+
+    @functools.cache
+    def is_directed(self):
+        return self.graph.is_directed()
+
+    @functools.cache
+    def degree(self, n):
+        return self.graph.degree(n)
+
+    @functools.cache
+    def lookup(self, node, field):
+        return self.graph.nodes[node][field]
+
+    # TODO: try to lru_cache this
+    def subgraph(self, nodes):
+        return FrozenGraph(self.graph.subgraph(nodes))

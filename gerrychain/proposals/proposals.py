@@ -46,7 +46,7 @@ def propose_chunk_flip(partition):
 
     valid_flips = [
         nbr
-        for nbr in partition.graph.cached_neighbors(flipped_node)
+        for nbr in partition.graph.neighbors(flipped_node)
         if partition.assignment[nbr] != partition.assignment[flipped_node]
     ]
 
@@ -87,7 +87,7 @@ def slow_reversible_propose_bi(partition):
 
     flip = random.choice(list(b_nodes))
     neighbor_assignments = list(set([partition.assignment[neighbor] for neighbor
-                                in partition.graph.cached_neighbors(flip)]))
+                                in partition.graph.neighbors(flip)]))
     neighbor_assignments.remove(partition.assignment[flip])
     flips = {flip: random.choice(neighbor_assignments)}
 
