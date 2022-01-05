@@ -87,16 +87,17 @@ class Partition:
         self.parent = parent
         self.flips = flips
 
-        self.assignment = parent.assignment.copy()
-        self.assignment.update(flips)
-
         self.graph = parent.graph
         self.updaters = parent.updaters
 
         self.flows = flows_from_changes(parent.assignment, flips)
 
+        self.assignment = parent.assignment.copy()
+        self.assignment.update_flows(self.flows)
+
         if "cut_edges" in self.updaters:
             self.edge_flows = compute_edge_flows(self)
+
 
     def __repr__(self):
         number_of_parts = len(self)
