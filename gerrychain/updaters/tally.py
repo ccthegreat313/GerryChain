@@ -119,7 +119,7 @@ class Tally:
 
         graph = partition.graph
 
-        for part, flow in flows_from_changes(parent.assignment, flips).items():
+        for part, flow in flows_from_changes(parent, partition).items():
             out_flow = compute_out_flow(graph, self.fields, flow)
             in_flow = compute_in_flow(graph, self.fields, flow)
             new_tally[part] = old_tally[part] - out_flow + in_flow
