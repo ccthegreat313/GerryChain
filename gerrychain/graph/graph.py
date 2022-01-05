@@ -181,6 +181,14 @@ class Graph(networkx.Graph):
         """
         return self.nodes[node][field]
 
+    @property
+    def node_indicies(self):
+        return tuple(self.nodes)
+
+    @property
+    def edge_indicies(self):
+        return tuple(self.edges)
+
     def add_data(self, df, columns=None):
         """Add columns of a DataFrame to a graph as node attributes using
         by matching the DataFrame's index to node ids.
@@ -355,6 +363,10 @@ class FrozenGraph:
         except AttributeError:
             return object.__getattribute__(self.graph, __name)
 
+    @functools.cache
+    def __getitem__(self, __name: str) -> Any:
+        return self.graph[__name]
+
     def __iter__(self):
         yield from self.node_indicies
 
@@ -369,11 +381,11 @@ class FrozenGraph:
 
     @functools.cached_property
     def node_indicies(self):
-        return tuple(self.graph.nodes)
+        return self.graph.node_indicies
 
-    @functools.cache
-    def is_directed(self):
-        return self.graph.is_directed()
+    @functools.cached_property
+    def edge_indicies(self):
+        return self.graph.edge_indicies
 
     @functools.cache
     def degree(self, n):

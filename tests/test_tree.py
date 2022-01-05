@@ -93,9 +93,9 @@ def test_random_spanning_tree_returns_tree_with_pop_attribute(graph_with_pop):
 
 def test_bipartition_tree_returns_a_tree(graph_with_pop):
     ideal_pop = sum(graph_with_pop.nodes[node]["pop"] for node in graph_with_pop) / 2
-    tree = networkx.Graph(
+    tree = Graph.from_networkx(networkx.Graph(
         [(0, 1), (1, 2), (1, 4), (3, 4), (4, 5), (3, 6), (6, 7), (6, 8)]
-    )
+    ))
     for node in tree:
         tree.nodes[node]["pop"] = graph_with_pop.nodes[node]["pop"]
 
@@ -124,9 +124,9 @@ def test_recom_works_as_a_proposal(partition_with_pop):
 
 
 def test_find_balanced_cuts_contraction():
-    tree = networkx.Graph(
+    tree = Graph.from_networkx(networkx.Graph(
         [(0, 1), (1, 2), (1, 4), (3, 4), (4, 5), (3, 6), (6, 7), (6, 8)]
-    )
+    ))
 
     # 0 - 1 - 2
     #   ||
