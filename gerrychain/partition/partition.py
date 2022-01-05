@@ -1,3 +1,4 @@
+import functools
 import json
 import geopandas
 import networkx
@@ -117,6 +118,7 @@ class Partition:
         """
         return self.__class__(parent=self, flips=flips)
 
+    @functools.cache
     def crosses_parts(self, edge):
         """Answers the question "Does this edge cross from one part of the
         partition to another?
