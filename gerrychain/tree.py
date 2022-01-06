@@ -303,11 +303,12 @@ def recursive_tree_part(
     :param epsilon: How far (as a percentage of ``pop_target``) from ``pop_target`` the parts
         of the partition can be
     :param node_repeats: Parameter for :func:`~gerrychain.tree_methods.bipartition_tree` to use.
+    :param method: The partition method to use.
     :return: New assignments for the nodes of ``graph``.
     :rtype: dict
     """
     flips = {}
-    remaining_nodes = set(graph.nodes)
+    remaining_nodes = graph.node_indicies
     # We keep a running tally of deviation from ``epsilon`` at each partition
     # and use it to tighten the population constraints on a per-partition
     # basis such that every partition, including the last partition, has a

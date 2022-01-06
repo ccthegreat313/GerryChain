@@ -183,11 +183,11 @@ class Graph(networkx.Graph):
 
     @property
     def node_indicies(self):
-        return tuple(self.nodes)
+        return set(self.nodes)
 
     @property
     def edge_indicies(self):
-        return tuple(self.edges)
+        return set(self.edges)
 
     def add_data(self, df, columns=None):
         """Add columns of a DataFrame to a graph as node attributes using
