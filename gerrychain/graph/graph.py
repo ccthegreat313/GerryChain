@@ -6,6 +6,7 @@ import warnings
 
 import geopandas as gp
 import networkx
+import retworkx
 from networkx.classes.function import frozen
 from networkx.readwrite import json_graph
 from shapely.ops import unary_union
@@ -343,7 +344,8 @@ class FrozenGraph:
     This class behaves slightly differently than :class:`Graph` or :class:`networkx.Graph`.
     """
     __slots__ = [
-        "graph"
+        "graph",
+        "pygraph"
     ]
 
     def __init__(self, graph: Graph):
@@ -351,6 +353,8 @@ class FrozenGraph:
         self.graph.join = frozen
         self.graph.add_data = frozen
         self.graph.add_data = frozen
+
+        self.pygraph = retworkx.networkx_converter(graph)
 
     @functools.cache
     def __len__(self):
