@@ -1,5 +1,7 @@
 import functools
+from gerrychain.graph.graph import FrozenGraph
 
+import retworkx
 import networkx as nx
 from networkx.algorithms import tree
 
@@ -165,6 +167,25 @@ def find_balanced_edge_cuts_memoization(h, choice=random.choice):
             cuts.append(Cut(edge=(node, pred[node]),
                             subset=set(h.graph.nodes) - part_nodes(node)))
     return cuts
+
+
+def bipartition_tree_retworkx(
+    graph: FrozenGraph,
+    pop_col: str,
+    pop_target: float,
+    epsilon: float,
+    node_repeats=1,
+    spanning_tree=None,
+    spanning_tree_fn=None,
+    balance_edge_fn=None,
+    choice=random.choice
+):
+    pops = [0] * len(graph.pygraph.node_indexes())
+    for node in graph.pygraph.node_indexes():
+        pops[node] = float(graph.pygraph[node][pop_col])
+
+    balanced_nodes = retworkx.bipartition_tree(graph.pygraph, lambda x: random.random(), pops, float(pop_target), float(epsilon))
+    return {graph.pygraph[x]["__networkx_node__"] for x in choice(balanced_nodes)[1]}
 
 
 def bipartition_tree(
