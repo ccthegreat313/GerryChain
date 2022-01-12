@@ -354,7 +354,7 @@ class FrozenGraph:
         self.graph.add_data = frozen
         self.graph.add_data = frozen
 
-        self.pygraph = retworkx.networkx_converter(graph)
+        self.pygraph = retworkx.networkx_converter(graph, keep_attributes=True)
 
     @functools.cache
     def __len__(self):
