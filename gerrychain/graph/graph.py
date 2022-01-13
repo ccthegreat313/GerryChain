@@ -371,14 +371,14 @@ class FrozenGraph:
     def __len__(self):
         return len(self.graph)
 
-    # @functools.cache # memory leak
+    # @functools.cache # memory leak?
     def __getattribute__(self, __name: str) -> Any:
         try:
             return object.__getattribute__(self, __name)
         except AttributeError:
             return object.__getattribute__(self.graph, __name)
 
-    @functools.cache
+    # @functools.cache # memory leak?
     def __getitem__(self, __name: str) -> Any:
         return self.graph[__name]
 
@@ -406,7 +406,7 @@ class FrozenGraph:
     def degree(self, n):
         return self.graph.degree(n)
 
-    @functools.cache
+    # @functools.cache
     def lookup(self, node, field):
         return self.graph.nodes[node][field]
 
@@ -418,7 +418,7 @@ class FrozenGraph:
             )
         )
 
-    @functools.cache
+    # @functools.cache
     def pygraph_pop_lookup(self, field: str):
         attrs = [0] * len(self.pygraph.node_indexes())
         for node in self.pygraph.node_indexes():
