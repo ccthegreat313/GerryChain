@@ -1,7 +1,7 @@
 import collections
 import functools
 import json
-from typing import Any
+from typing import Any, Tuple
 import warnings
 
 import geopandas as gp
@@ -345,16 +345,27 @@ class FrozenGraph:
     """
     __slots__ = [
         "graph",
-        "pygraph"
+        "pygraph",
+        "retworkx_networkx_mapping",
+        "networkx_retworkx_mapping"
     ]
 
-    def __init__(self, graph: Graph):
+    def __init__(self, graph: Graph, pygraph: retworkx.PyGraph = None, mappings: Tuple[dict, dict] = None):
         self.graph = networkx.classes.function.freeze(graph)
         self.graph.join = frozen
         self.graph.add_data = frozen
         self.graph.add_data = frozen
 
-        self.pygraph = retworkx.networkx_converter(graph, keep_attributes=True)
+        if pygraph:
+            self.pygraph = pygraph
+        else:
+            self.pygraph = retworkx.networkx_converter(graph, keep_attributes=True)
+
+        if mappings:
+            self.retworkx_networkx_mapping, self.networkx_retworkx_mapping = mappings
+        else:
+            self.retworkx_networkx_mapping = {node: self.pygraph[node]["__networkx_node__"] for node in self.pygraph.node_indexes()}
+            self.networkx_retworkx_mapping = {self.pygraph[node]["__networkx_node__"]: node for node in self.pygraph.node_indexes()}
 
     @functools.cache
     def __len__(self):
@@ -401,4 +412,15 @@ class FrozenGraph:
 
     # TODO: try to lru_cache this
     def subgraph(self, nodes):
-        return FrozenGraph(self.graph.subgraph(nodes))
+        return FrozenGraph(self.graph.subgraph(nodes), 
+            self.pygraph.subgraph(
+                [self.networkx_retworkx_mapping[x] for x in nodes]
+            )
+        )
+
+    @functools.cache
+    def pygraph_pop_lookup(self, field: str):
+        attrs = [0] * len(self.pygraph.node_indexes())
+        for node in self.pygraph.node_indexes():
+            attrs[node] = float(self.pygraph[node][field])
+        return attrs
