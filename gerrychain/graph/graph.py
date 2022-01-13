@@ -371,7 +371,7 @@ class FrozenGraph:
     def __len__(self):
         return len(self.graph)
 
-    @functools.cache
+    # @functools.cache # memory leak
     def __getattribute__(self, __name: str) -> Any:
         try:
             return object.__getattribute__(self, __name)
